@@ -18,7 +18,7 @@ export class TodoService {
   private currentFilter: Filter = Filter.All;
 
   todo$: Observable<Todo[]> = this.displayTodosSubject.asObservable();
-  lengths: Observable<number> = this.lengthSubject.asObservable();
+  length$: Observable<number> = this.lengthSubject.asObservable();
 
   constructor(private storageService: LocalStorageService){}
 
@@ -32,6 +32,13 @@ export class TodoService {
     this.storageService.setObject(TodoService.TodoStorageKey, this.todos);
     this.filterTodos(this.currentFilter, false);
     this.updateTodosData();
+  }
+
+  addTodo(content: string){
+    const date = new Date(Date.now()).getTime();
+    const newTodo = new Todo(date, content);
+    this.todos.unshift(newTodo);
+    this.updateToLocalStorage();
   }
 
   filterTodos(filter: Filter, isFiltering: boolean = true) {
