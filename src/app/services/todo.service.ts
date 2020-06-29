@@ -24,7 +24,7 @@ export class TodoService {
 
   fetchFromLocalStorage() {
     this.todos = this.storageService.getValue<Todo[]>(TodoService.TodoStorageKey) || [];
-    this.filteredTodos = [...this.todos.map(todo => ({...todo}))];
+    this.filteredTodos = [...this.todos];
     this.updateTodosData();
   }
 
@@ -49,6 +49,30 @@ export class TodoService {
     this.updateToLocalStorage();
   }
 
+  editTodo(id: number, content: string) {
+    const index = this.todos.findIndex(t => t.id === id);
+    const todo = this.todos[index];
+    todo.content = content;
+    this.todos.splice(index, 1, todo);
+    this.updateToLocalStorage();
+  }
+
+  deleteTodo(id: number) {
+    const index = this.todos.findIndex(t => t.id === id);
+    this.todos.splice(index, 1);
+    this.updateToLocalStorage();
+  }
+
+  toggleAll() {
+    this.todos = this.todos.map(todo => {
+      return {
+        ...todo,
+        isCompleted: !this.todos.every(t => t.isCompleted)
+      };
+    });
+    this.updateToLocalStorage();
+  }
+
   filterTodos(filter: Filter, isFiltering: boolean = true) {
     this.currentFilter = filter;
     switch(filter) {
@@ -59,7 +83,7 @@ export class TodoService {
         this.filteredTodos = this.todos.filter(todo => todo.isCompleted);
         break;
       case Filter.All:
-        this.filteredTodos = [...this.todos.map(todo => ({ ...todo }))];
+        this.filteredTodos = [...this.todos];
         break;
     }
 
